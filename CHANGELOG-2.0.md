@@ -1,5 +1,7 @@
 # 2.0.x
 
+bin/console akeneo:batch:create-job internal add_to_existing_product_model mass_edit add_to_existing_product_model '{}' 'Add products to an existing product model' --env=prod
+
 ## Improvements
 
 - IM-825: allow concurrent AJAX requests by closing the session in a listener
