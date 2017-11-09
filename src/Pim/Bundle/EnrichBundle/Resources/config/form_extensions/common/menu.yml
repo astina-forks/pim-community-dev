@@ -306,4 +306,3 @@ extensions:
         targetZone: helpMenu
         config:
             title: Help
-            iconModifier: help

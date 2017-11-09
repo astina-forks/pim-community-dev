@@ -33,7 +33,7 @@ define(
                         title: 'Help',
                         url,
                         active: false,
-                        iconModifier: 'help'
+                        iconModifier: 'iconHelp'
                     }));
                 });
 
