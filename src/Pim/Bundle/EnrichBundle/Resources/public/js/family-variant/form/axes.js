@@ -32,17 +32,23 @@ define([
         /**
          * Group attributes by attribute group
          */
-        const groupAttributes = (attributes, attributeGroups) => (attributeCodes) => {
+        const groupAttributes = (attributes, attributeGroups) => (attributeCodes, lockedAttributes) => {
             return Object.values(attributeGroups)
                 .sort(sortOrdered)
                 .map(attributeGroup => {
+                    const groupAttributes = attributes.filter(
+                        attribute =>
+                            attribute.group === attributeGroup.code &&
+                            attributeCodes.indexOf(attribute.code) !== -1
+                    ).sort(sortOrdered);
+
+                    const locked = groupAttributes.filter(
+                        attribute => !lockedAttributes.includes(attribute.code)
+                    ).length === 0;
+
                     return {
-                        attributeGroup,
-                        attributes: attributes.filter(
-                            attribute =>
-                                attribute.group === attributeGroup.code &&
-                                attributeCodes.indexOf(attribute.code) !== -1
-                        ).sort(sortOrdered)
+                        attributeGroup: Object.assign({}, attributeGroup, {locked}),
+                        attributes: groupAttributes
                     };
                 })
                 .filter(section => section.attributes.length !== 0);
@@ -56,7 +62,9 @@ define([
 
         return BaseForm.extend({
             className: 'family-variant-levels AknFamilyVariant',
-            events: {'click .AknIconButton--delete': 'removeAttributeFromVariantAttributeSet'},
+            events: {
+                'click .delete-attribute': 'removeAttributeFromVariantAttributeSet'
+            },
             template: _.template(template),
 
             /**
@@ -131,6 +139,7 @@ define([
                             tolerance: 'pointer',
                             cursor: 'move',
                             cancel: 'div.alert',
+                            items: '.movable',
                             receive: (event, ui) => {
                                 const originLevel = parseInt(ui.sender[0].dataset.level);
                                 const destinationLevel = parseInt(ui.item[0].parentNode.dataset.level);
@@ -157,12 +166,13 @@ define([
                             tolerance: 'pointer',
                             cursor: 'move',
                             cancel: 'div.alert',
+                            items: '.movable-group',
                             receive: (event, ui) => {
                                 const destinationLevel = parseInt(ui.item[0].parentNode.dataset.level);
                                 const originLevel = parseInt(ui.sender[0].dataset.level);
                                 const movedAttributes = Object.values(ui.item[0].querySelectorAll('li')).map(
                                     domElement => domElement.dataset.attributeCode
-                                );
+                                ).filter(movedAttribute => !lockedAttributes.includes(movedAttribute));
 
                                 this.handleAttributeGroupDrop(
                                     originLevel,
@@ -220,7 +230,6 @@ define([
             },
 
             removeAttributeFromVariantAttributeSet(event) {
-                event.preventDefault();
                 const $attributeToRemove = $(event.currentTarget.parentElement);
                 const attributeCodeToRemove = $attributeToRemove.data('attribute-code');
                 const variantAttributeSetLevel = $attributeToRemove.closest('[data-level]').data('level');

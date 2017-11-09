@@ -40,7 +40,8 @@
         border: 1px solid @AknBorderColor;
         padding: 5px 20px;
         overflow-y: auto;
-        color: @AknDarkBlue
+        color: @AknDarkBlue;
+        min-height: 300px;
     }
 
     &-axes {
@@ -66,11 +67,14 @@
         border-bottom: 1px solid @AknSlateGrey;
         font-size: @AknFontSizeBig;
         color: @AknGrey;
-        cursor: move;
-        background: url("../../images/icon-dragcolumns.svg") no-repeat 0 center;
-        background-size: 13px;
-        padding-left: 20px;
         margin: 0;
+
+        &--movable {
+            background: url("../../images/icon-dragcolumns.svg") no-repeat 0 center;
+            background-size: 13px;
+            padding-left: 20px;
+            cursor: move;
+        }
     }
 
     &-columnList {
